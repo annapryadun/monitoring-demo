@@ -15,11 +15,19 @@ jobs:
     
     - name: Build the Docker image
       run: |
-        docker build . --file Dockerfile --tag monitoring-demo-app:$(date +%s)
-        echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_ENV
-
+        echo "Building Docker image..."
+        docker build . --file Dockerfile --tag monitoring-demo-app:latest
+        echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+      
+    - name: Check Docker images
+      run: |
+        echo "Listing all Docker images:"
+        docker images
+        
     - name: Log in to GitHub Container Registry
-      run: echo "${{ secrets.DOCKER_BUILD_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+      run: |
+        echo "Logging in to GitHub Container Registry..."
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
     
     - name: Push image to GitHub Container Registry
       run: |
@@ -34,8 +42,17 @@ jobs:
         # Use Docker `latest` tag convention
         [ "$VERSION" == "main" ] && VERSION=latest
         
-        echo IMAGE_ID=$IMAGE_ID
-        echo VERSION=$VERSION
+        echo "IMAGE_ID=$IMAGE_ID"
+        echo "VERSION=$VERSION"
         
+        echo "Tagging Docker image..."
         docker tag monitoring-demo-app:${{ env.IMAGE_TAG }} $IMAGE_ID:$VERSION
+        
+        echo "Pushing Docker image..."
         docker push $IMAGE_ID:$VERSION
+      
+    - name: Check final Docker images
+      if: always()
+      run: |
+        echo "Listing all Docker images after push:"
+        docker images
