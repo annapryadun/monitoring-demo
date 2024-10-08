@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build and Push Docker image
 
 on:
   push:
@@ -14,8 +14,10 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag monitoring-demo-app:$(date +%s)
-    
+      run: |
+        docker build . --file Dockerfile --tag monitoring-demo-app:$(date +%s)
+        echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_ENV
+
     - name: Log in to GitHub Container Registry
       run: echo "${{ secrets.DOCKER_BUILD_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
     
@@ -35,5 +37,5 @@ jobs:
         echo IMAGE_ID=$IMAGE_ID
         echo VERSION=$VERSION
         
-        docker tag monitoring-demo-app:$(date +%s) $IMAGE_ID:$VERSION
+        docker tag monitoring-demo-app:${{ env.IMAGE_TAG }} $IMAGE_ID:$VERSION
         docker push $IMAGE_ID:$VERSION
