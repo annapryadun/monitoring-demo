@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitoring-demo-app-deployment
+  namespace: monitoring-demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monitoring-demo-app
+  template:
+    metadata:
+      labels:
+        app: monitoring-demo-app
+    spec:
+      containers:
+      - name: monitoring-demo-app
+        image: ghcr.io/annapryadun/monitoring-demo-app:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+      imagePullSecrets:
+      - name: github-registry
