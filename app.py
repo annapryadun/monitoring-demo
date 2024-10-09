@@ -61,4 +61,4 @@ def metrics():
 
 if __name__ == '__main__':
     # Use 0.0.0.0 to bind to all interfaces
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8081)), debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)), debug=True)
